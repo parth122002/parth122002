@@ -1,0 +1,62 @@
+online code
+
+library("tm")
+library("SnowballC")
+library("wordcloud")
+library("RColorBrewer")
+library("Rcpp")
+
+filePath <-
+  "http://www.sthda.com/sthda/RDoc/example-files/martin-luther-king-i-have-a-dream-speech.txt"
+text <- readLines(filePath)
+docs <- Corpus(VectorSource(text))
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+docs <- tm_map(docs, toSpace, "/")
+docs <- tm_map(docs, toSpace, "@")
+docs <- tm_map(docs, toSpace, "\\|")
+docs <- tm_map(docs, content_transformer(tolower))
+docs <- tm_map(docs, removeNumbers)
+docs <- tm_map(docs, removeWords, stopwords("english"))
+docs <- tm_map(docs, removeWords, c("blabla1", "blabla2"))
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, stripWhitespace)
+dtm <- TermDocumentMatrix(docs)
+m <- as.matrix(dtm)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 10)
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 1,
+          max.words=200, random.order=FALSE, rot.per=0.35,
+          colors=brewer.pal(8, "Dark2"))
+
+
+
+
+offline code
+
+# Load libraries
+library(wordcloud)
+library(RColorBrewer)
+
+# Text data for word cloud
+words <- c("R ", "Python", "Data Science", "Machine Learning", "Data",
+           "Daft", "Visualization", "Plot", "Tutorial", "Keywords", "Fun",
+           "Color", "ggplot2", "YouTube", "Channel", "Subscribe", "Text",
+           "NLP", "Deep Learning", "Predictive Modeling", "Analytics",
+           "Learn", "Video", "Teach", "Help", "Interesting", "Word", "Cloud",
+           "Histogram", "Scatterplot", "Bar Plot", "Density", "Pie Chart")
+
+# Word frequencies
+freqs <- c(100, 70, 90, 50, 80, 20, 30, 30, 20, 
+           10, 70, 40, 20, 15, 15, 25, 5, 5,
+           15, 25, 35, 50, 30, 20, 30, 50, 
+           20, 20, 15, 25, 25, 5, 10)
+
+set.seed(3)
+
+wordcloud(
+words = words,
+freq = freqs,
+max.words = 100,
+colors = brewer.pal(8,"Dark2"))
